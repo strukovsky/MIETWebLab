@@ -6,8 +6,20 @@
         {% load static %}
         <link rel="stylesheet" href="{% static 'style.css' %}">
     </head>
-    <body>
+    <div class="Centered">
         <h1>Dima is studing english!</h1>
         <h2>Website about english grammar</h2>
+        <h3>English is quite easy to learn!</h3>
+    </div>
+        <div class="Container">
+            <p>Menu</p>
+            <ul>
+                <li><a href="grammar">grammar</a></li>
+                <li><a href="vocabulary">vocabulary</a></li>
+                <li><a href="authenticate">authenticate/sign up</a></li>
+            </ul>
+        </div>
+        <img class="Centered" src="{% static 'dummy.jpeg' %}">
+        <iframe width="1424" height="595" src="https://www.youtube.com/embed/x7IEGc2gYm4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </body>
 </html>

@@ -2,5 +2,34 @@
 * {
     background-color: black;
     color: white;
-    font-family: "Lora";
+    font-family: "Lora", "serif";
+}
+
+ul {
+    list-style-type: none;
+}
+
+.Centered{
+    width: 100%;
+    text-align: center;
+}
+
+.Container{
+    margin: 30px;
+}
+
+h1{
+    font-size: xx-large;
+}
+
+.Box{
+    border-radius: 30px;
+    border-width: 2px;
+    border-color: white;
+    border-style: solid;
+}
+
+#dictionary{
+    font-size: 20pt;
+    color: aquamarine;
 }
