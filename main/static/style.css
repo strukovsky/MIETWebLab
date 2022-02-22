@@ -1,5 +1,6 @@
 
 * {
+    font-size: 16pt;
     background-color: black;
     color: white;
     font-family: "Lora", "serif";
@@ -9,27 +10,67 @@ ul {
     list-style-type: none;
 }
 
-.Centered{
+.Centered {
     width: 100%;
     text-align: center;
 }
 
-.Container{
+.Container {
     margin: 30px;
 }
 
-h1{
+h1 {
     font-size: xx-large;
 }
 
-.Box{
+.Box {
     border-radius: 30px;
     border-width: 2px;
     border-color: white;
     border-style: solid;
 }
 
-#dictionary{
+#dictionary {
     font-size: 20pt;
     color: aquamarine;
 }
+
+
+input {
+    border-radius: 35px;
+    border-color: white;
+    border-style: solid;
+    border-width: 3px;
+    margin-top: 15px;
+    text-align: center;
+}
+
+input:invalid {
+    border-color: orangered;
+}
+
+/*input:valid {*/
+/*    border-color: orangered;*/
+/*}*/
+
+
+
+@keyframes pulse {
+    from {
+        transform: scale(100%, 100%);
+    }
+
+    50% {
+        transform: scale(104%, 104%);
+    }
+
+    to {
+        transform: scale(100%, 100%);
+    }
+}
+
+/*input:required {*/
+/*    animation-name: pulse;*/
+/*    animation-duration: 2s;*/
+/*    animation-iteration-count: infinite;*/
+/*}*/
