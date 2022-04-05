@@ -5,6 +5,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Lora&display=swap" rel="stylesheet">
     {% load static %}
     <link rel="stylesheet" href="{% static 'style.css' %}">
+
 </head>
 <body>
 <div class="Centered">
@@ -18,14 +19,14 @@
         <li><a href="/">index</a></li>
     </ul>
     <div class="Container">
-        <form method="post" class="Form">
-            {% csrf_token %}
+        <form>
             <input type="text" name="name" placeholder="Name"><br>
             <input type="text" name="surname" placeholder="Surname"><br>
             <input type="email" name="email" placeholder="Email"><br>
             <input type="password" name="password" placeholder="Password"><br>
-            <input type="submit" value="Authenticate or sign up" onclick="validate()">
         </form>
+
+        <button onclick="validate()">Authenticate or sign up</button>
     </div>
 
 </div>
@@ -39,56 +40,104 @@
 
         if (name.length < 2) {
             document.forms[0].name.setCustomValidity("Name should be at least 2 characters.");
+            return false;
         } else {
             document.forms[0].name.setCustomValidity("");
+            return true;
         }
         if (!nameRegex.exec(name)) {
             document.forms[0].name.setCustomValidity("Name should contain only letters");
+            return false;
         } else {
             document.forms[0].name.setCustomValidity("");
+            return true;
         }
     }
 
     function validateSurname(surname) {
         if (surname.length < 3) {
             document.forms[0].surname.setCustomValidity("Invalid field.");
+            return false;
         } else {
             document.forms[0].surname.setCustomValidity("");
+            return true;
         }
         if (!nameRegex.exec(surname)) {
             document.forms[0].surname.setCustomValidity("Name should contain only letters");
+            return false;
         } else {
             document.forms[0].surname.setCustomValidity("");
+            return true;
         }
     }
 
     function validateEmail(email) {
-        if (!emailRegex.exec(email)) {
+        /* if (!emailRegex.exec(email)) {
             document.forms[0].email.setCustomValidity("Email is incorrect.");
+            return false;
         } else {
             document.forms[0].email.setCustomValidity("");
-        }
+            return true;
+        } */
+        return 1;
     }
 
     function validatePassword(password) {
         if (password.length < 5) {
             document.forms[0].password.setCustomValidity("Password should be at least 5 characters length.");
+            return false;
 
         } else {
             document.forms[0].password.setCustomValidity("");
+            return true;
         }
     }
 
-    function validate() {
+    async function performAuth(user) {
+
+        try {
+            await fetch("http://127.0.0.1:8000/api/authenticate", {
+                method: "POST",
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json;charset=utf-8',
+                },
+                body: JSON.stringify(user)
+            }).then((response) => {
+                response.text().then(data =>{
+                    if(data === "authenticated"){
+                        document.location.href = "/";
+                    }
+                    else
+                    {
+                        alert("Error on authentication!");
+                    }
+                });
+
+            });
+        } catch (e) {
+            alert("Failed to authenticate. Bad credentials or user already exists");
+        }
+    }
+
+    async function validate() {
         const name = document.forms[0].name.value;
         const surname = document.forms[0].surname.value;
         const email = document.forms[0].email.value;
         const password = document.forms[0].password.value;
+        let validation = 1;
+        validation &= validateName(name);
+        validation &= validateSurname(surname);
+        validation &= validateEmail(email);
+        validation &= validatePassword(password);
 
-        validateName(name);
-        validateSurname(surname);
-        validateEmail(email);
-        validatePassword(password);
+        if (validation) {
+            const user = {
+                name, surname, email, password
+            }
+            await performAuth(user);
+        } else alert("Error in your data!");
+
     }
 </script>
 </html>
