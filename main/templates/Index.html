@@ -1,25 +1,90 @@
 <html>
-    <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Lora&display=swap" rel="stylesheet">
-        {% load static %}
-        <link rel="stylesheet" href="{% static 'style.css' %}">
-    </head>
-    <div class="Centered">
-        <h1>Dima is studing english!</h1>
-        <h2>Website about english grammar</h2>
-        <h3>English is quite easy to learn!</h3>
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora&display=swap" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+<div class="Centered">
+    <h1>Dima is studing english!</h1>
+    <h2>Website about english grammar</h2>
+    <h3>English is quite easy to learn!</h3>
+</div>
+<div class="Container">
+    <p>Menu</p>
+    <ul>
+        <li><a href="grammar">grammar</a></li>
+        <li><a href="vocabulary">vocabulary</a></li>
+        <li><a href="authenticate">authenticate/sign up</a></li>
+    </ul>
+</div>
+<div>
+    <form onsubmit="handleSubmit()">
+        {% csrf_token %}
+        {{ comment_form }}
+        <input type="submit">
+    </form>
+</div>
+<div>
+    <h3>Comments</h3>
+    <div id="comments">
+
     </div>
-        <div class="Container">
-            <p>Menu</p>
-            <ul>
-                <li><a href="grammar">grammar</a></li>
-                <li><a href="vocabulary">vocabulary</a></li>
-                <li><a href="authenticate">authenticate/sign up</a></li>
-            </ul>
-        </div>
-        <img class="Centered" src="{% static 'dummy.jpeg' %}">
-        <iframe width="1424" height="595" src="https://www.youtube.com/embed/x7IEGc2gYm4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-    </body>
+</div>
+</body>
+<script>
+    async function sendDataToAPI(comment) {
+        await fetch("/api/comments/", {
+            method: "post",
+            mode: "no-cors",
+            headers: {"Content-Type": "application/json;charset=utf-8"},
+            body: comment
+        }).then(async (response) => {
+            response.text().then(async data => {
+                alert(data)
+                if (data === "Created") {
+                    document.getElementById("comments").innerHTML = "";
+                    await getComments();
+                }
+            });
+        })
+    }
+
+    async function handleSubmit() {
+        const author = document.forms[0].author.value;
+        const contents = document.forms[0].contents.value;
+        try {
+            await sendDataToAPI(JSON.stringify({author, contents}))
+        } catch (e) {
+            alert(e)
+        }
+    }
+
+    async function getComments() {
+        await fetch("/api/comments/", {
+            method: "get",
+            mode: "no-cors",
+        }).then(async (response) => {
+            response.text().then(data => {
+                let comments = JSON.parse(data);
+                let root = document.getElementById('comments');
+                comments.forEach(comment => {
+                    let commentElement = document.createElement("div");
+                    let commentHeading = document.createElement("h3");
+                    commentHeading.innerText = `Comment from ${comment.author} at ${comment.date.substring(0, 19)}`
+                    let commentContents = document.createElement("span");
+                    commentContents.innerText = comment.contents;
+                    commentElement.appendChild(commentHeading);
+                    commentElement.appendChild(commentContents);
+                    root.appendChild(commentElement);
+                });
+
+            });
+        });
+    }
+
+    getComments();
+</script>
 </html>

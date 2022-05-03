@@ -1,11 +1,12 @@
 import json
+from hashlib import sha512
 
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
 from django.contrib import auth
 from django.contrib.auth.models import User
+from django.http import HttpRequest, HttpResponse
 from django.views import View
-from hashlib import sha512
+
+from api.models import Comment
 
 
 class AuthView(View):
@@ -41,3 +42,25 @@ class AuthView(View):
         except KeyError as e:
             print(e)
             return HttpResponse("Bad credentials", status_code=400)
+
+
+class CommentsView(View):
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        comments = Comment.objects.all().order_by('date')
+        return HttpResponse(json.dumps(list(
+            map(lambda comment: {"author": comment.author, "contents": comment.contents, "date": str(comment.date)},
+                comments))))
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        try:
+            data = json.loads(request.body.decode("utf-8"))
+            author = data['author']
+            contents = data['contents']
+            comment, created = Comment.objects.get_or_create(author=author, contents=contents)
+            if created:
+                return HttpResponse("Created")
+            else:
+                return HttpResponse("Already exists", status=400)
+        except Exception:
+            return HttpResponse("Bad entity", status=422)
