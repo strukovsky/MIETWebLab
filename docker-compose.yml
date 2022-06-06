@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=miet_web_lab
+      - POSTGRES_USER=miet_web_lab
+      - POSTGRES_PASSWORD=qwerty12
+    ports:
+      - "5432:5432"
+  project:
+    build: .
+    ports:
+      - '80:80'
+    depends_on:
+      - db
+volumes:
+  db:

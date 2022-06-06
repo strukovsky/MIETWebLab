@@ -3,38 +3,161 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lora&display=swap" rel="stylesheet">
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+
+* {
+    font-size: 16pt;
+    background-color: black;
+    color: white;
+    font-family: "Lora", "serif";
+}
+
+ul {
+    list-style-type: none;
+}
+
+.Centered {
+    width: 100%;
+    text-align: center;
+}
+
+.Container {
+    margin: 30px;
+}
+
+h1 {
+    font-size: xx-large;
+}
+
+.Box {
+    border-radius: 30px;
+    border-width: 2px;
+    border-color: white;
+    border-style: solid;
+}
+
+#dictionary {
+    font-size: 20pt;
+    color: aquamarine;
+}
+
+
+input {
+    border-radius: 35px;
+    border-color: white;
+    border-style: solid;
+    border-width: 3px;
+    margin-top: 15px;
+    text-align: center;
+}
+
+input:invalid {
+    border-color: orangered;
+}
+
+/*input:valid {*/
+/*    border-color: orangered;*/
+/*}*/
+
+
+
+@keyframes pulse {
+    from {
+        transform: scale(100%, 100%);
+    }
+
+    50% {
+        transform: scale(104%, 104%);
+    }
+
+    to {
+        transform: scale(100%, 100%);
+    }
+}
+
+/*input:required {*/
+/*    animation-name: pulse;*/
+/*    animation-duration: 2s;*/
+/*    animation-iteration-count: infinite;*/
+/*}*/
+    </style>
 </head>
 <body>
 <div class="Centered">
-    <h1>Dima is studing english!</h1>
-    <h2>Website about english grammar</h2>
-    <h3>English is quite easy to learn!</h3>
+    <button onclick="translateToRussian()">🇷🇺</button>
+    <button onclick="translateToEnglish()">🇬🇧</button>
 </div>
-<div class="Container">
-    <p>Menu</p>
-    <ul>
-        <li><a href="grammar">grammar</a></li>
-        <li><a href="vocabulary">vocabulary</a></li>
-        <li><a href="authenticate">authenticate/sign up</a></li>
-    </ul>
+<div class="Centered">
+    <h1 id="first_heading">Dima is studying english!</h1>
+    <h2 id="second_heading">Website about english grammar</h2>
+    <h3 id="third_heading">English is quite easy to learn!</h3>
 </div>
 <div>
-    <form onsubmit="handleSubmit()">
+    <form>
         {% csrf_token %}
-        {{ comment_form }}
-        <input type="submit">
+        <label id="comment_author" for="input_comment_author">Author</label>
+        <input type="text" name="author" maxlength="255" required="" id="input_comment_author"><br>
+        <label id="comment_contents" for="input_comment_contents">Contents</label>
+        <input type="text" name="contents" maxlength="255" required="" id="input_comment_contents"><br>
     </form>
+    <button id="comment_submit" onclick="handleSubmit()">Send 🙈</button>
 </div>
 <div>
-    <h3>Comments</h3>
+    <h3 id="comments_heading">Comments</h3>
     <div id="comments">
-
     </div>
 </div>
 </body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js"
+        integrity="sha512-wT7uPE7tOP6w4o28u1DN775jYjHQApdBnib5Pho4RB0Pgd9y7eSkAV1BTqQydupYDB9GBhTcQQzyNMPMV3cAew=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
+
+    const russianLanguage = {
+        "first_heading": "Дима изучает английский",
+        "second_heading": "Сайт рассказывает о английской грамматике",
+        "third_heading": "Английский будет легко учить",
+        "comments_heading": "Комментарии",
+        "comment_author": "Автор комментария",
+        "comment_contents": "Текст комментария",
+        "comment_submit": "Отправить 🙈",
+    }
+
+    const englishLanguage = {
+        "first_heading": "Dima is studying english!",
+        "second_heading": "Website about english grammar",
+        "third_heading": "English is quite easy to learn!",
+        "comments_heading": "Comments",
+        "comment_author": "Author",
+        "comment_contents": "Contents",
+        "comment_submit": "Send 🙈",
+    }
+
+    const russianLocale = "ru-RU";
+    const englishLocale = "en-US";
+
+    const translations = {
+        "ru-RU": russianLanguage,
+        "en-US": englishLanguage,
+    }
+
+    function translate(locale) {
+        for (let key in translations[locale]) {
+            document.getElementById(key).innerText = translations[locale][key];
+        }
+
+        Cookies.set("Lang", locale);
+        getComments();
+    }
+
+    function translateToRussian() {
+        translate(russianLocale);
+    }
+
+    function translateToEnglish() {
+        translate(englishLocale);
+    }
+
     async function sendDataToAPI(comment) {
         await fetch("/api/comments/", {
             method: "post",
@@ -70,14 +193,18 @@
             response.text().then(data => {
                 let comments = JSON.parse(data);
                 let root = document.getElementById('comments');
+                root.innerHTML = "";
                 comments.forEach(comment => {
                     let commentElement = document.createElement("div");
                     let commentHeading = document.createElement("h3");
-                    commentHeading.innerText = `Comment from ${comment.author} at ${comment.date.substring(0, 19)}`
+                    let date = new Date(comment.date);
+                    let formattedLocale = date.toLocaleTimeString(Cookies.get("Lang", englishLocale));
+                    commentHeading.innerText = `${comment.author}: ${formattedLocale}`
                     let commentContents = document.createElement("span");
                     commentContents.innerText = comment.contents;
                     commentElement.appendChild(commentHeading);
                     commentElement.appendChild(commentContents);
+
                     root.appendChild(commentElement);
                 });
 
@@ -85,6 +212,13 @@
         });
     }
 
+    let lang = Cookies.get("Lang");
+    if (lang === "ru") {
+        translateToRussian();
+    }
+
     getComments();
+
+
 </script>
 </html>
